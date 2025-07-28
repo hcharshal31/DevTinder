@@ -6,26 +6,30 @@ app.listen(3000, () => {
     console.log("Listening to port 3000 succussfully.")
 });
 
-app.use("/hello", (req, res) => {
-    res.send("Hello Everyone from port 3000.")
+// app.use("/hello/world", (req, res) => {
+//     res.send("Hello world.")
+// });
+
+// app.use("/hello", (req, res) => {
+//     res.send("Hello Everyone from port 3000.")
+// });
+
+app.get("/user", (req, res) => {
+    res.send("Got the data succussfully.")
 });
 
-app.use("/browse", (req, res) => {
-    res.send("Welcome to browse page.")
+app.post("/user", (req, res) => {
+    res.send("Data added to database successfully.")
 });
 
-app.use("/harshal", (req, res) => {
-    res.send("Hello Harshal!")
+app.put("/user", (req, res) => {
+    res.send("Data updated succussfully using PUT method")
 });
 
-app.use("/pratik", (req, res) => {
-    res.send("Hello Pratik!")
+app.patch("/user", (req, res) =>{
+    res.send("Data updated succussfully using PATCH method")
 });
 
-app.use("/shambho", (req, res) => {
-    res.send("Hello shambho!")
-});
-
-app.use("/", (req, res) => {
-    res.send("Welocome to dashboard.")
-});
+app.delete("/user", (res, req) => {
+    res.send("Deleted data succussfully.")
+})
