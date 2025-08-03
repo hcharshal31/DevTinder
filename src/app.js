@@ -10,26 +10,20 @@ const app = express();
 
 // app.get("/user", adminAuth);
 
+app.use(express.json());
+
 
 app.post("/signup", async (req, res) => {
-    const user = new User({
-        firstName: "Pratik",
-        lastName: "Chavan",
-        emailId: "pratik123@gmail.com",
-        password: "pratik@123"
-    });
+    const user = new User(req.body);
 
     try{
         await user.save();
+        console.log(req.body);
         res.send("User added succussfully!")
     } catch(err) {
         res.status(400).send("Bad request");
         console.log(err);
-    }
-
-    
-
-    
+    }    
 })
 
 
