@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
-const User = require("../Models/user");
+require("dotenv").config();
+const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
     
@@ -8,7 +8,9 @@ const userAuth = async (req, res, next) => {
         const { token } = req.cookies;
 
         if(!token){
-            throw new Error("Invalid Token.")
+            return res.status(401).json({
+                message: "Token missing or invalid"
+            })
         }
 
         const decodedMessage = jwt.verify(token, process.env.JWT_SECRET);
