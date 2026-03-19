@@ -3,7 +3,8 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
-const profileRoutes = require("./routes/profileRoutes")
+const profileRoutes = require("./routes/profileRoutes");
+const connectionRequestRoutes = require("./routes/connectionRequestRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -14,6 +15,9 @@ app.use(cookieParser());
 
 app.use("/", authRoutes);
 app.use("/", profileRoutes);
+
+// Connection request
+app.use("/", connectionRequestRoutes);
 
 
 

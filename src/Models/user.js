@@ -2,10 +2,9 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-require("dotenv");
 
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
         firstName: {
             type: String,
             trim: true,
@@ -18,6 +17,7 @@ const userSchema = mongoose.Schema({
             type: String,
             trim: true,
             unique: true,
+            index: true,
             lowercase: true,
             validate(value){
                 if(!validator.isEmail(value)){
@@ -27,21 +27,18 @@ const userSchema = mongoose.Schema({
         },
         password: {
             type: String,
-            // validate(value){
-            //     if(!validator.isStrongPassword(value)){
-            //         throw new Error("Your password is not strong")
-            //     }
-            // }
+            select: false,
+            minlength: 8
         },
         age: {
             type: Number,
         },
         gender: {
             type: String,
-            validate(value){
-                if(!["male", "female", "others"].includes(value)){
-                    throw new Error("Invalid gender data.");
-                }
+            lowercase: true,
+            enum: {
+                values: ["male", "female", "others"],
+                message: "{VALUE} value is not correct",
             }
         },
         about:{
@@ -50,6 +47,7 @@ const userSchema = mongoose.Schema({
         },
         photoURL: {
             type: String,
+            trim: true,
             default: function () {
                 if (this.gender === "male") {
                     return "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/man-user-circle-icon.png";
@@ -60,14 +58,17 @@ const userSchema = mongoose.Schema({
                 }
             }
         }
+},
+{
+    timestamps: true,
 });
 
 // Here we are attaching the getJWT method on userSchema for geting the jWT token for the every instance of the user collection.
-userSchema.methods.getJWT = async function() {
+userSchema.methods.getJWT = function() {
     const user = this;
     // Here this means the current user
 
-    const jwtToken = await jwt.sign({_id: user._id}, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const jwtToken = jwt.sign({_id: user._id}, process.env.JWT_SECRET, { expiresIn: "7d" });
     return jwtToken;
 }
 

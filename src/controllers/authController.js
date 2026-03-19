@@ -1,11 +1,13 @@
-const { validateSignUpData, validateLoginData } = require("../utils/validation")
+const User = require("../models/user");
+const bcrypt = require("bcrypt");
+const { validateSignUpData, validateLoginData } = require("../utils/validation");
 
 const signUpUser = async (req, res) => {
     try{
 
         validateSignUpData(req.body);
 
-        const { firstName, lastName, emailId, password, age, gender } = req.body;
+        const { firstName, lastName, emailId, password, age, gender, about } = req.body;
 
         const isExistingEmail = await User.findOne({emailId});
         if(isExistingEmail){
@@ -25,7 +27,8 @@ const signUpUser = async (req, res) => {
             emailId,
             password: hashedPassword,
             age,
-            gender
+            gender,
+            about
         });
 
         await user.save();
@@ -34,6 +37,7 @@ const signUpUser = async (req, res) => {
             message: "User added successfully!"
         })
     } catch(err) {
+        console.log("Error")
         return res.status(400).json({
             message: "Bad request",
             err,
@@ -42,14 +46,14 @@ const signUpUser = async (req, res) => {
 }
 
 const logInUser = async (req, res) => {
-    const { emailId, password } = req.body;
     try{
-
         validateLoginData(req.body);
 
-        const user = await User.findOne({emailId});
+        const { emailId, password } = req.body;
+
+        const user = await User.findOne({emailId}).select("+password");
         if(!user){
-            return res.status(404).json({
+            return res.status(401).json({
                 message: "Invalid credentials"
             });
         }
@@ -60,7 +64,8 @@ const logInUser = async (req, res) => {
             res.cookie("token", jwtToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: "strict"
+                sameSite: "strict",
+                maxAge: 7 * 24 * 60 * 60 * 1000
             });
             return res.status(200).json({
                 message: "Login successful!"
@@ -72,7 +77,7 @@ const logInUser = async (req, res) => {
         }
         
     }catch(error){
-        return res.status(error.status || 500).json({
+        return res.status(500).json({
             message: error.message || "Unknown error: Please try again after some time"
         });
     }
